@@ -1,7 +1,19 @@
 import * as THREE from 'three'
 import gsap from 'gsap'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
-console.log(gsap)
+const cursor = {
+    x:0,
+    y:0
+}
+window.addEventListener('mousemove', (event) =>
+{
+    cursor.x = event.clientX / sizes.width - 0.5
+    cursor.y = - (event.clientY / sizes.height - 0.5)
+
+})
+
+
 // Scene
 const scene = new THREE.Scene()
 
@@ -45,9 +57,46 @@ scene.add(axesHelper)
 
 //sizes
 const sizes = {
-    width: 800,
-    height: 600
+    width: window.innerWidth,
+    height: window.innerHeight
 }
+window.addEventListener('resize', () => {
+    
+    // update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    //update camera 
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+})
+
+// handle full screen with Chrome, Safari, Firefox, etc.
+window.addEventListener('dblclick', () => {
+    
+    const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement
+
+    if(!fullscreenElement){
+        if(canvas.requestFullscreen) {
+            canvas.requestFullscreen()
+        } else  if(canvas.webkitFullscreenElement){
+            canvas.webkitRequestFullscreen
+            
+        }
+        
+    } else {
+        if(document.exitFullscreen) {
+            document.exitFullscreen
+        } else if (document.webkitFullscreenElement) {
+            document.webkitexitFullscreen
+        }
+    }
+})
+
 // Camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
 camera.position.z = 3
@@ -63,22 +112,30 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 
 renderer.render(scene, camera)
-
+// Controls
+const controls = new OrbitControls(camera, canvas)
+controls.enableDamping = true
 // Animation
 
 // gsap.to(mesh.position, {duration: 1, delay: 1, x: 2})
 
-let time = Date.now()
+const clock = new THREE.Clock()
 
 const tick = () => {
-    // fixing frame rate issues
-    const currentTime = Date.now()
-    const deltaTime = currentTime - time
-    time = currentTime
 
+    //update camera 
+    
+    // fixing frame rate issues
+    const elapsedTime = clock.getElapsedTime
+
+    //update controls
+    controls.update()
+
+    //update renderer
+    renderer.setSize(sizes.width, sizes.height)
 
     // update objects
-    // mesh.rotation.y += 0.001 * deltaTime
+    // mesh.rotation.y = elapsedTime
 
     // Renderer
     renderer.render(scene, camera)
