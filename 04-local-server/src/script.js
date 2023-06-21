@@ -1,6 +1,11 @@
 import * as THREE from 'three'
 import gsap from 'gsap'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import * as dat from 'lil-gui'
+
+
+// gui 
+const gui = new dat.GUI()
 
 const cursor = {
     x:0,
@@ -17,45 +22,75 @@ window.addEventListener('mousemove', (event) =>
 // Scene
 const scene = new THREE.Scene()
 
-// Making a group
-// const group = new THREE.Group()
-// scene.add(group)
 
-// const cube1 = new THREE.Mesh(
-//     new THREE.BoxGeometry(1, 1, 1),
-//     new THREE.MeshBasicMaterial({color: 'blue'})
-// )
-
-// const cube2 = new THREE.Mesh(
-//     new THREE.BoxGeometry(1, 1, 1),
-//     new THREE.MeshBasicMaterial({color: 'green'})
-// )
-
-// cube2.position.x = -2
-// group.add(cube1)
-// group.add(cube2)
-
-// group.position.y = 1
-
-// Red Cube
 const geometry = new THREE.BoxGeometry(1, 1, 1)
-const material = new THREE.MeshBasicMaterial({color: 'orange'})
+const plane = new THREE.PlaneGeometry(5,5)
+const material = new THREE.MeshStandardMaterial({
+    wireframe: false
+})
+material.roughness = 0.3
+
+// playing around with different lighting
+const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x0000ff, 1)
+const pointLight = new THREE.PointLight(0xff9000, 0.5)
+const directionalLight = new THREE.AmbientLight(0x00fffc, 0.3)
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+// allowing directonal light to cast shadow
+directionalLight.castShadow = true
+
+directionalLight.position.set(1, 0.25, 0)
+hemisphereLight.position.set(0,1,0)
+pointLight.position.set(0,1,0)
+
+scene.add(hemisphereLight)
+scene.add(pointLight)
+scene.add(directionalLight)
+scene.add(ambientLight)
+
+// adding 3d objects to scene
 const mesh = new THREE.Mesh(geometry, material)
-
-// Cube transformations
-// mesh.position.x = 1
-// mesh.rotation.y = 2
-// mesh.rotation.z = -3
-
-// mesh.scale.y = .5
+//allowing mesh to cast shadow
+mesh.castShadow = true
+const planeMesh = new THREE.Mesh(plane, material)
+//rotating plane by 90 deg. or pi/2
+planeMesh.rotateX(-(Math.PI/2))
+// setting position of plane below cube
+planeMesh.position.set(0, -1, 0)
+//allowing plane to recieve shadow
+planeMesh.receiveShadow = true
 
 scene.add(mesh)
+scene.add(planeMesh)
 
 // Axis helper
 const axesHelper = new THREE.AxesHelper()
 scene.add(axesHelper)
 
-//sizes
+// Rotation function
+var rotation = false
+const parameters = {
+    rotate: () => {
+        if (!rotation) {
+            rotation = true
+        } else {
+            rotation = false
+        }
+    }
+
+}
+
+// adding gui properties
+gui.add(mesh.position, 'x', -3, 3, 0.01).name('y-position')
+gui.add(mesh.position, 'y', -3, 3, 0.01).name('x-position')
+gui.add(mesh.position, 'z', -3, 3, 0.01).name('z-position')
+gui.add(material, 'wireframe')
+gui.add(parameters, 'rotate')
+gui.add(directionalLight, 'intensity').min(0).max(1).step(.001).name('Light Intensity')
+gui.add(directionalLight.position, 'y').min(0).max(5).step(.001).name('Light y-pos')
+
+
+
+//code below handles window resizing 
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
@@ -75,7 +110,8 @@ window.addEventListener('resize', () => {
 
 })
 
-// handle full screen with Chrome, Safari, Firefox, etc.
+// handle full screen with Chrome, Safari, Firefox, etc. 
+// TODO: Cant exit out of full-screen via double clicking
 window.addEventListener('dblclick', () => {
     
     const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement
@@ -141,6 +177,11 @@ const tick = () => {
     renderer.render(scene, camera)
 
     window.requestAnimationFrame(tick)
+    
+    if (rotation){
+        mesh.rotation.y += 0.001
+        mesh.rotation.x += 0.001
+    }
 
 }
 tick()
