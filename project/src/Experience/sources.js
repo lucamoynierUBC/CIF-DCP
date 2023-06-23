@@ -15,4 +15,12 @@ export default [
             'textures/environmentMap/nz.jpg'
         ]
     }
+    // },
+    // {
+    //     name: "brooklynCampus",
+    //     type: 'rhinoModel',
+    //     path: 'models/campus.3dm'
+
+
+    // }
 ]

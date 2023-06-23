@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import Experience from '../Experience.js'
 import Environment from './Environment.js'
+import Resources from '../Utils/Resources.js'
 // import Environment from './Environment.js'
 //import Floor from './Floor.js'
 //import Fox from './Fox.js'
@@ -11,7 +12,8 @@ export default class World
     {
         this.experience = new Experience()
         this.scene = this.experience.scene
-        this.environment = new Environment()
+        this.resources = this.experience.resources
+
 
         const testMesh = new THREE.Mesh(
             new THREE.BoxGeometry(1,1,1),
@@ -29,6 +31,15 @@ export default class World
         
 
         this.scene.add(testFloor)
+
+        // retrieve the resources instanmce and listen to the ready event before instantiating the Environment class
+        this.resources.on('ready', () => {
+            console.log('resouces are rady')
+            this.environment = new Environment()
+        })
+
+
+
     }
 
     

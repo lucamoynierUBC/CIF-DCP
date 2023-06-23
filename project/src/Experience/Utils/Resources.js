@@ -29,6 +29,8 @@ export default class Resources extends EventEmitter {
         this.startLoading()
     }
 
+    // TODO: make loading bar while assests load
+
 
     setLoaders() {
         this.loaders = {}
@@ -42,11 +44,11 @@ export default class Resources extends EventEmitter {
     startLoading() {
         for (const source of this.sources)
         {
-            if (source.type == 'gltf') {
+            if (source.type == 'gltfModel') {
                 this.loaders.GLTFLoader.load(
                     source.path,
                     (file) => {
-                        console.log(source, file)
+                        this.sourceLoaded(source, file)
                     }
                 )
 
@@ -56,7 +58,7 @@ export default class Resources extends EventEmitter {
                 this.loaders.textureLoader.load(
                     source.path,
                     (file) => {
-                        console.log(source, file)
+                        this.sourceLoaded(source, file)
                     }
                 )
 
@@ -66,12 +68,35 @@ export default class Resources extends EventEmitter {
                 this.loaders.cubeTextureLoader.load(
                     source.path,
                     (file) => {
-                        console.log(source, file)
+                        this.sourceLoaded(source, file)
                     }
                 )
 
             }
 
+            else if (source.type == 'rhinoModel') {
+                this.loaders.Rhino3dmLoader.load(
+                    source.path,
+                    (file) => {
+                        this.sourceLoaded(source, file)
+                    }
+                )
+            }
+            
+
         }
     }
+
+    sourceLoaded(source, file) {
+        //resource saved in item
+        this.items[source.name] = file
+        this.loaded++
+
+        //check if assets are finished loading
+        if(this.loaded == this.toLoad) {
+            this.trigger('ready')
+
+        }
+    }
+    
 }
