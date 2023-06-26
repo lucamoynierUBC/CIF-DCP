@@ -14,13 +14,15 @@ export default [
             'textures/environmentMap/pz.jpg',
             'textures/environmentMap/nz.jpg'
         ]
+    },
+    {
+        name: 'campusModel',
+        type: 'rhinoModel',
+        path: 'models/campus.3dm'
+    },
+    {
+        name: 'testBuilding',
+        type: 'gltfModel',
+        path: 'models/testMesh.glb'
     }
-    // },
-    // {
-    //     name: "brooklynCampus",
-    //     type: 'rhinoModel',
-    //     path: 'models/campus.3dm'
-
-
-    // }
 ]

@@ -35,6 +35,8 @@ export default class Resources extends EventEmitter {
     setLoaders() {
         this.loaders = {}
         this.loaders.Rhino3dmLoader = new Rhino3dmLoader()
+        // Specify path to a folder containing WASM libraries or a CDN, need this for the rhino loader. 
+        this.loaders.Rhino3dmLoader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@7.15.0/' )
         this.loaders.GLTFLoader = new GLTFLoader()
         this.loaders.textureLoader = new THREE.TextureLoader
         this.loaders.cubeTextureLoader = new THREE.CubeTextureLoader()
